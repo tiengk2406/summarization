@@ -21,10 +21,9 @@ private:
 
 public:
 	std::vector<std::vector<float>> weightMat; // TF-IDF weighting matrix
-	tfidf(std::vector<std::vector<std::string>> & input):rawDataSet(input)
-	{
-		calMat();
-	}
+	tfidf(std::vector<std::vector<std::string>> & input);
+    void printMat();
+    void printVocabList();
 };
 
 #endif

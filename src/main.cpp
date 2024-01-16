@@ -5,6 +5,9 @@
 #include <vector>
 #include <cstdio>
 #include <map>
+#include <functional>
+#include <numeric>
+
 #include "tfidf.hpp"
 
 
@@ -13,6 +16,7 @@ const short MAX_DIMENSION = 200;
 
 #ifdef USE_UTILS_FILE
 #include "utils.hpp"
+
 #else
 const int FAILURE = 1;
 const int SUCCESS = 0;
@@ -123,8 +127,15 @@ class Graph {
     float cosineMatrix[MAX_DIMENSION][MAX_DIMENSION];
 
     void removeStopWord(const std::string& sentence, const std::map<std::string, bool>& stopWordMap, std::string *sentenceResult) {}
-    std::vector<std::vector<float>> tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMat);
+    std::vector<std::vector<float>> tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMat, const std::vector<std::vector<float>> &tfidfMat1);
     int convertDoc2Vec(const std::string docMem);
+    float norm(const std::vector<float> a) {
+      float ret = 0;
+      for (auto i : a) {
+        ret += pow(i, 2);
+      }
+      return pow(ret, 1.0/2);
+    }
     // input sentence content 
     // remove stop word.
     // convert doc to vec. model map : key: work... value: index of matrix.
@@ -139,8 +150,17 @@ class Graph {
 };
 
 
-std::vector<std::vector<float>> Graph::tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMat) {
+std::vector<std::vector<float>> Graph::tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMat, const std::vector<std::vector<float>> &tfidfMat1) {
   std::vector<std::vector<float>> ret;
+  int nrow = tfidfMat.size();
+  int ncol = tfidfMat[0].size();
+  for (auto i = 0; i < nrow; i++) {
+    for (auto j = 0; j < ncol; j++) {
+      float dotValue = std::inner_product(tfidfMat[i].begin(), tfidfMat[i].end(), tfidfMat[j].begin(), 0.0);
+      float val = dotValue/(norm(tfidfMat[i]) * norm(tfidfMat1[j]));
+      ret[i].push_back(val);
+    }
+  }
 
 
   return ret;
@@ -156,11 +176,14 @@ int Graph::createGraph(const std::vector<std::unique_ptr<Sentence>> &sentenceLis
 
   tfidf ins(data);
 	std::vector<std::vector<float>> mat = ins.weightMat;
-  std::vector<std::vector<float>> consineMat = tfidf2ConsineMat(mat);
+  // std::vector<std::vector<float>> consineMat = tfidf2ConsineMat(mat, mat);
   std::cout << "vector size = " << sentenceList.size() << std::endl; 
   std::cout << "The number of word = " << numOfWord << std::endl;
   std::cout << "tfidf matrix: total row=" << ins.weightMat.size() << std::endl;
 	std::cout << "tfidf matrix: total col=" << ins.weightMat[0].size() << std::endl;
+  // ins.printMat();
+  // ins.printVocabList();
+  // std::cout << "so dong = " << consineMat.size() << "so cot = " << consineMat[0].size() << std::endl;
 
   return SUCCESS;
 }
