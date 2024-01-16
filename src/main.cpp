@@ -10,10 +10,6 @@
 
 #include "tfidf.hpp"
 
-
-
-const short MAX_DIMENSION = 200;
-
 #ifdef USE_UTILS_FILE
 #include "utils.hpp"
 
@@ -67,8 +63,10 @@ void parseOneFile(const char *filePath, std::map<std::string,bool> stopWordMap, 
     // format for each line: ex  " \"%[^\"]\"",
     // <s docid="AP900118-0029" num="15" wdcount="9"> ``Honecker took things into his own hands,'' Schabowski said.</s>
     sscanf(lineContent.c_str(), "<s docid=\"%100[^\"]\" num=\"%d\" wdcount=\"%d\">%[^\n]s</s>", 
-            docID, &num, &wdCount, &content);
-    
+            docID, &num, &wdCount, content);
+    if (wdCount <= 5 || std::strlen(content) <= 10) {
+      continue;
+    }
     // remove </s>
     if (std::strlen(content) > 4)
       content[std::strlen(content) - 4] = 0;
@@ -123,50 +121,77 @@ int parseStopWordFile(const std::filesystem::path& stopWordPath, std::map<std::s
 
 class Graph {
   private:
-    std::string vericeList[MAX_DIMENSION];
-    float cosineMatrix[MAX_DIMENSION][MAX_DIMENSION];
 
-    void removeStopWord(const std::string& sentence, const std::map<std::string, bool>& stopWordMap, std::string *sentenceResult) {}
     std::vector<std::vector<float>> tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMat, const std::vector<std::vector<float>> &tfidfMat1);
     int convertDoc2Vec(const std::string docMem);
-    float norm(const std::vector<float> a) {
-      float ret = 0;
-      for (auto i : a) {
-        ret += pow(i, 2);
-      }
-      return pow(ret, 1.0/2);
-    }
-    // input sentence content 
-    // remove stop word.
-    // convert doc to vec. model map : key: work... value: index of matrix.
-        // calcTFIDF, calcConsine => store to matrix
+    float cosineSimilarity(const float* MatA, const float*  MatB, size_t lengh);
 
   public:
     Graph() {}
     ~Graph(){}
-    int createGraph(const std::vector<std::unique_ptr<Sentence>>& sentenceList, std::map<std::string, bool> stopWordMap);
-    // vericeList = docID
-    // matrix 
+    int createGraph(const std::vector<std::unique_ptr<Sentence>>& sentenceList);
+    void calculatePagerank(std::vector<std::vector<float>>& graph, std::vector<float>& pagerank, float dampingFactor, int iterations);
+
 };
 
+void Graph::calculatePagerank(std::vector<std::vector<float>>& graph, std::vector<float>& pagerank, float dampingFactor, int iterations) {
+  int numPages = graph.size();
+  std::vector<float> newPagerank(numPages, 1.0 / numPages);
 
-std::vector<std::vector<float>> Graph::tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMat, const std::vector<std::vector<float>> &tfidfMat1) {
-  std::vector<std::vector<float>> ret;
-  int nrow = tfidfMat.size();
-  int ncol = tfidfMat[0].size();
-  for (auto i = 0; i < nrow; i++) {
-    for (auto j = 0; j < ncol; j++) {
-      float dotValue = std::inner_product(tfidfMat[i].begin(), tfidfMat[i].end(), tfidfMat[j].begin(), 0.0);
-      float val = dotValue/(norm(tfidfMat[i]) * norm(tfidfMat1[j]));
-      ret[i].push_back(val);
+  for (int iter = 0; iter < iterations; ++iter) {
+    for (int i = 0; i < numPages; ++i) {
+      float incomingPR = 0.0;
+      for (int j = 0; j < numPages; ++j) {
+        if (graph[j][i] == 1) {
+          incomingPR += pagerank[j] / static_cast<float>(graph[j].size());
+        }
+      }
+      newPagerank[i] = (1.0 - dampingFactor) / numPages + dampingFactor * incomingPR;
     }
-  }
 
+    pagerank = newPagerank;
+  }
+}
+
+
+std::vector<std::vector<float>> Graph::tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMatA, const std::vector<std::vector<float>> &tfidfMatB) {
+  std::vector<std::vector<float>> ret;
+  float val = 0.0;
+  std::vector<float> valRow;
+  size_t nrow = tfidfMatA.size();
+  size_t ncol = tfidfMatA[0].size();
+  for (size_t i = 0; i < nrow; i++) {
+    for (size_t j = 0; j < nrow; j++) {
+      val = cosineSimilarity(tfidfMatA[i].data(), tfidfMatB[j].data(), ncol);
+      valRow.push_back(val);
+    }
+    ret.push_back(valRow);
+    valRow.clear();
+  }
+  std::cout << "CosineMatrix: [row = " << ret.size() << "].[Col=]" << ret[0].size() << std::endl;
 
   return ret;
 }
 
-int Graph::createGraph(const std::vector<std::unique_ptr<Sentence>> &sentenceList, std::map<std::string, bool> stopWordMap) {
+
+float Graph::cosineSimilarity(const float* MatA, const float*  MatB, size_t lengh)
+{
+  float dot = 0.0, normA = 0.0, normB = 0.0, ret = 0.0 ;
+  for (size_t i = 0; i < lengh; ++i) {
+    dot += MatA[i] * MatB[i] ;
+    normA += MatA[i] * MatB[i] ;
+    normB += MatB[i] * MatB[i] ;
+  }
+
+  if (normA != 0 && normB != 0) {
+    ret = dot/(sqrt(normA) * sqrt(normB));
+  }
+
+  return ret;
+}
+
+
+int Graph::createGraph(const std::vector<std::unique_ptr<Sentence>> &sentenceList) {
   std::vector<std::vector<std::string>>  data;
   for (auto it = std::begin(sentenceList); it != std::end(sentenceList); ++it)
   {
@@ -176,7 +201,7 @@ int Graph::createGraph(const std::vector<std::unique_ptr<Sentence>> &sentenceLis
 
   tfidf ins(data);
 	std::vector<std::vector<float>> mat = ins.weightMat;
-  // std::vector<std::vector<float>> consineMat = tfidf2ConsineMat(mat, mat);
+  std::vector<std::vector<float>> consineMat = tfidf2ConsineMat(mat, mat);
   std::cout << "vector size = " << sentenceList.size() << std::endl; 
   std::cout << "The number of word = " << numOfWord << std::endl;
   std::cout << "tfidf matrix: total row=" << ins.weightMat.size() << std::endl;
@@ -184,28 +209,20 @@ int Graph::createGraph(const std::vector<std::unique_ptr<Sentence>> &sentenceLis
   // ins.printMat();
   // ins.printVocabList();
   // std::cout << "so dong = " << consineMat.size() << "so cot = " << consineMat[0].size() << std::endl;
+  size_t cosineSize = consineMat.size();
+  std::vector<float> pagerank(consineMat.size(), 1.0 / consineMat.size());
+  float dampingFactor = 0.85;
+  int iterations = 100;
+  calculatePagerank(consineMat, pagerank, dampingFactor, iterations);
+  std::cout << "Pagerank values:\n";
+  for (size_t i = 0; i < cosineSize; ++i) {
+    std::cout << "Page " << i + 1 << ": " << pagerank[i] << "\n";
+  }
 
   return SUCCESS;
 }
 
-
-
-
-
-// void convert2Graph(const std::vector<std::unique_ptr<Sentence>>& sentenceList, Graph* graph) {
-  
-// }
-
-// void calPageRank(const Graph& graph, int numFactor, std::vector<std::unique_ptr<Sentence>>* sentenceOutList) {
-
-// }
-// void preprocessData(std::vector<std::unique_ptr<Sentence>>* data, const std::map<std::string, bool>& stopWordMap) {
-//    //remove stop word
-
-//    // separage word
-// }
-
-int summurize(const std::filesystem::path& input, const std::filesystem::path& output, 
+int summurize(const std::filesystem::path& input, const std::filesystem::path& /*output*/, 
               const std::filesystem::path& stopWordPath) {
   int ret = FAILURE;
   std::vector<std::unique_ptr<Sentence>> sentenceList, sentenceOutput;
@@ -220,12 +237,8 @@ int summurize(const std::filesystem::path& input, const std::filesystem::path& o
     return ret;
   }
   
-  // preprocessData(&sentenceList, stopWordMap);
   Graph graph;
-  graph.createGraph(sentenceList, stopWordMap);
-  // convert2Graph(sentenceList, &graph);
-  // calPageRank(graph, 5, &sentenceOutput);
-  // exportResult(output);
+  graph.createGraph(sentenceList);
 
 
   return ret;
