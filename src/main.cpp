@@ -7,7 +7,6 @@
 #include <map>
 #include <functional>
 #include <numeric>
-
 #include "tfidf.hpp"
 
 #ifdef USE_UTILS_FILE
@@ -125,7 +124,22 @@ class Graph {
     std::vector<std::vector<float>> tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMat, const std::vector<std::vector<float>> &tfidfMat1);
     int convertDoc2Vec(const std::string docMem);
     float cosineSimilarity(const float* MatA, const float*  MatB, size_t lengh);
+    float calNorm(const std::vector<float>& v1, const std::vector<float>& v2);
 
+    template<typename A, typename B>
+    static std::pair<B,A> flip_pair(const std::pair<A,B> &p)
+    {
+        return std::pair<B,A>(p.second, p.first);
+    }
+
+    template<typename A, typename B>
+    std::multimap<B,A> flip_map(const std::map<A,B> &src)
+    {
+        std::multimap<B,A> dst;
+        std::transform(src.begin(), src.end(), std::inserter(dst, dst.begin()), 
+                      flip_pair<A,B>);
+        return dst;
+    }
   public:
     Graph() {}
     ~Graph(){}
@@ -147,6 +161,11 @@ void Graph::calculatePagerank(std::vector<std::vector<float>>& graph, std::vecto
         }
       }
       newPagerank[i] = (1.0 - dampingFactor) / numPages + dampingFactor * incomingPR;
+    }
+
+    if (calNorm(pagerank, newPagerank) < 0.0000056) {
+      std::cout << "PageRank stop at: " << iter << std::endl;
+      break;
     }
 
     pagerank = newPagerank;
@@ -173,6 +192,14 @@ std::vector<std::vector<float>> Graph::tfidf2ConsineMat(const std::vector<std::v
   return ret;
 }
 
+float Graph::calNorm(const std::vector<float>& v1, const std::vector<float>& v2)
+{
+  float ret = 0;
+  for (size_t i = 0; i < v1.size(); i++) {
+      ret += (v1[i] - v2[i]) * (v1[i] - v2[i]);
+  }
+  return sqrt(ret);
+}
 
 float Graph::cosineSimilarity(const float* MatA, const float*  MatB, size_t lengh)
 {
@@ -210,14 +237,35 @@ int Graph::createGraph(const std::vector<std::unique_ptr<Sentence>> &sentenceLis
   // ins.printVocabList();
   // std::cout << "so dong = " << consineMat.size() << "so cot = " << consineMat[0].size() << std::endl;
   size_t cosineSize = consineMat.size();
-  std::vector<float> pagerank(consineMat.size(), 1.0 / consineMat.size());
+  std::vector<float> pagerank(cosineSize, 1.0 / cosineSize);
   float dampingFactor = 0.85;
   int iterations = 100;
   calculatePagerank(consineMat, pagerank, dampingFactor, iterations);
-  std::cout << "Pagerank values:\n";
+  std::map<std::vector<std::string>, float> resultMap;
   for (size_t i = 0; i < cosineSize; ++i) {
-    std::cout << "Page " << i + 1 << ": " << pagerank[i] << "\n";
+    resultMap.insert({sentenceList[i].get()->wordList, pagerank[i]});
   }
+  std::multimap<float, std::vector<std::string>> dst = flip_map(resultMap);
+  
+  // std::cout << "Pagerank values:\n";
+  std::cout << "\nContents of flipped map in descending order:\n" << std::endl;
+  int index = 0;
+  for(std::multimap<float, std::vector<std::string>>::const_reverse_iterator it = dst.rbegin(); it != dst.rend(); ++it) {
+    std::cout << "[pageRank value = " << it->first << "]:";
+    for (auto str : it->second) {
+      std::cout << str << " ";
+    }
+    std::cout << std::endl;
+    if (index > 10) 
+    {
+      break;
+    }
+    index ++;
+      // std::cout << it -> first << " " << it -> second << std::endl; 
+  }
+  // std::cout << std::endl;
+
+
 
   return SUCCESS;
 }

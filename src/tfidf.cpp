@@ -102,8 +102,8 @@ void tfidf::calMat()
 
 void tfidf::printMat() {
   std::cout << "Print TFIDF matrix[" << nrow << "][" << ncol << "]\n";
-  for (auto i = 0; i < nrow; i++) {
-    for (auto j = 0; j < ncol; j++) {
+  for (unsigned int i = 0; i < nrow; i++) {
+    for (unsigned int j = 0; j < ncol; j++) {
       std::cout << weightMat[i][j] << "     ";
     }
     std::cout << std::endl;
