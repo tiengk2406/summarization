@@ -7,25 +7,16 @@
 #include <map>
 #include <functional>
 #include <numeric>
-#include "tfidf.hpp"
+#include "pageRank.hpp"
 
 #ifdef USE_UTILS_FILE
 #include "utils.hpp"
 
 #else
-const int FAILURE = 1;
-const int SUCCESS = 0;
-class Sentence {
-public:
-  std::string docID;
-  std::vector<std::string> wordList;
-  int wdCount;
-  
-};
 
 std::string tolowerStr(std::string s)
 {
-  std::transform(s.begin(), s.end(), s.begin(), 
+  std::transform(s.begin(), s.end(), s.begin(),
                   [](unsigned char c){ return std::tolower(c); }
                 );
   return s;
@@ -61,7 +52,7 @@ void parseOneFile(const char *filePath, std::map<std::string,bool> stopWordMap, 
     std::getline(file, lineContent);
     // format for each line: ex  " \"%[^\"]\"",
     // <s docid="AP900118-0029" num="15" wdcount="9"> ``Honecker took things into his own hands,'' Schabowski said.</s>
-    sscanf(lineContent.c_str(), "<s docid=\"%100[^\"]\" num=\"%d\" wdcount=\"%d\">%[^\n]s</s>", 
+    sscanf(lineContent.c_str(), "<s docid=\"%100[^\"]\" num=\"%d\" wdcount=\"%d\">%[^\n]s</s>",
             docID, &num, &wdCount, content);
     if (wdCount <= 5 || std::strlen(content) <= 10) {
       continue;
@@ -74,8 +65,8 @@ void parseOneFile(const char *filePath, std::map<std::string,bool> stopWordMap, 
 
     sentence->wdCount = wdCount;
     sentenceList->push_back(std::move(sentence));
-  } 
-  file.close();  
+  }
+  file.close();
 }
 
 int parseData(const std::filesystem::path& path, std::map<std::string,bool> stopWordMap, std::vector<std::unique_ptr<Sentence>>* sentenceList){
@@ -93,7 +84,7 @@ int parseData(const std::filesystem::path& path, std::map<std::string,bool> stop
     }
 
   }
-  
+
   return SUCCESS;
 }
 
@@ -118,162 +109,59 @@ int parseStopWordFile(const std::filesystem::path& stopWordPath, std::map<std::s
 }
 #endif
 
-class Graph {
-  private:
-
-    std::vector<std::vector<float>> tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMat, const std::vector<std::vector<float>> &tfidfMat1);
-    int convertDoc2Vec(const std::string docMem);
-    float cosineSimilarity(const float* MatA, const float*  MatB, size_t lengh);
-    float calNorm(const std::vector<float>& v1, const std::vector<float>& v2);
-
-    template<typename A, typename B>
-    static std::pair<B,A> flip_pair(const std::pair<A,B> &p)
-    {
-        return std::pair<B,A>(p.second, p.first);
-    }
-
-    template<typename A, typename B>
-    std::multimap<B,A> flip_map(const std::map<A,B> &src)
-    {
-        std::multimap<B,A> dst;
-        std::transform(src.begin(), src.end(), std::inserter(dst, dst.begin()), 
-                      flip_pair<A,B>);
-        return dst;
-    }
-  public:
-    Graph() {}
-    ~Graph(){}
-    int createGraph(const std::vector<std::unique_ptr<Sentence>>& sentenceList);
-    void calculatePagerank(std::vector<std::vector<float>>& graph, std::vector<float>& pagerank, float dampingFactor, int iterations);
-
-};
-
-void Graph::calculatePagerank(std::vector<std::vector<float>>& graph, std::vector<float>& pagerank, float dampingFactor, int iterations) {
-  int numPages = graph.size();
-  std::vector<float> newPagerank(numPages, 1.0 / numPages);
-
-  for (int iter = 0; iter < iterations; ++iter) {
-    for (int i = 0; i < numPages; ++i) {
-      float incomingPR = 0.0;
-      for (int j = 0; j < numPages; ++j) {
-        if (graph[j][i] == 1) {
-          incomingPR += pagerank[j] / static_cast<float>(graph[j].size());
-        }
-      }
-      newPagerank[i] = (1.0 - dampingFactor) / numPages + dampingFactor * incomingPR;
-    }
-
-    if (calNorm(pagerank, newPagerank) < 0.0000056) {
-      std::cout << "PageRank stop at: " << iter << std::endl;
-      break;
-    }
-
-    pagerank = newPagerank;
-  }
-}
-
-
-std::vector<std::vector<float>> Graph::tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMatA, const std::vector<std::vector<float>> &tfidfMatB) {
-  std::vector<std::vector<float>> ret;
-  float val = 0.0;
-  std::vector<float> valRow;
-  size_t nrow = tfidfMatA.size();
-  size_t ncol = tfidfMatA[0].size();
-  for (size_t i = 0; i < nrow; i++) {
-    for (size_t j = 0; j < nrow; j++) {
-      val = cosineSimilarity(tfidfMatA[i].data(), tfidfMatB[j].data(), ncol);
-      valRow.push_back(val);
-    }
-    ret.push_back(valRow);
-    valRow.clear();
-  }
-  std::cout << "CosineMatrix: [row = " << ret.size() << "].[Col=]" << ret[0].size() << std::endl;
-
-  return ret;
-}
-
-float Graph::calNorm(const std::vector<float>& v1, const std::vector<float>& v2)
+template<typename A, typename B>
+static std::pair<B,A> flip_pair(const std::pair<A,B> &p)
 {
-  float ret = 0;
-  for (size_t i = 0; i < v1.size(); i++) {
-      ret += (v1[i] - v2[i]) * (v1[i] - v2[i]);
-  }
-  return sqrt(ret);
+    return std::pair<B,A>(p.second, p.first);
 }
 
-float Graph::cosineSimilarity(const float* MatA, const float*  MatB, size_t lengh)
+template<typename A, typename B>
+std::multimap<B,A> flip_map(const std::map<A,B> &src)
 {
-  float dot = 0.0, normA = 0.0, normB = 0.0, ret = 0.0 ;
-  for (size_t i = 0; i < lengh; ++i) {
-    dot += MatA[i] * MatB[i] ;
-    normA += MatA[i] * MatB[i] ;
-    normB += MatB[i] * MatB[i] ;
-  }
-
-  if (normA != 0 && normB != 0) {
-    ret = dot/(sqrt(normA) * sqrt(normB));
-  }
-
-  return ret;
+    std::multimap<B,A> dst;
+    std::transform(src.begin(), src.end(), std::inserter(dst, dst.begin()),
+                  flip_pair<A,B>);
+    return dst;
 }
 
-
-int Graph::createGraph(const std::vector<std::unique_ptr<Sentence>> &sentenceList) {
-  std::vector<std::vector<std::string>>  data;
-  for (auto it = std::begin(sentenceList); it != std::end(sentenceList); ++it)
-  {
-    Sentence* stemp = it->get();
-    data.push_back(stemp->wordList);
+void writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceList, const std::vector<float>& pageRank,
+                  int numOutputSentence, const std::filesystem::path& output) {
+  std::map<std::string, float> resultMap;
+  size_t size = pageRank.size();
+  for (size_t i = 0; i < size; ++i) {
+    resultMap.insert({sentenceList[i].get()->docID, pageRank[i]});
   }
+  std::multimap<float, std::string> dst = flip_map(resultMap);
 
-  tfidf ins(data);
-	std::vector<std::vector<float>> mat = ins.weightMat;
-  std::vector<std::vector<float>> consineMat = tfidf2ConsineMat(mat, mat);
-  std::cout << "vector size = " << sentenceList.size() << std::endl; 
-  std::cout << "The number of word = " << numOfWord << std::endl;
-  std::cout << "tfidf matrix: total row=" << ins.weightMat.size() << std::endl;
-	std::cout << "tfidf matrix: total col=" << ins.weightMat[0].size() << std::endl;
-  // ins.printMat();
-  // ins.printVocabList();
-  // std::cout << "so dong = " << consineMat.size() << "so cot = " << consineMat[0].size() << std::endl;
-  size_t cosineSize = consineMat.size();
-  std::vector<float> pagerank(cosineSize, 1.0 / cosineSize);
-  float dampingFactor = 0.85;
-  int iterations = 100;
-  calculatePagerank(consineMat, pagerank, dampingFactor, iterations);
-  std::map<std::vector<std::string>, float> resultMap;
-  for (size_t i = 0; i < cosineSize; ++i) {
-    resultMap.insert({sentenceList[i].get()->wordList, pagerank[i]});
-  }
-  std::multimap<float, std::vector<std::string>> dst = flip_map(resultMap);
-  
-  // std::cout << "Pagerank values:\n";
-  std::cout << "\nContents of flipped map in descending order:\n" << std::endl;
+  std::cout << "\nsummariztion order:\n" << std::endl;
   int index = 0;
-  for(std::multimap<float, std::vector<std::string>>::const_reverse_iterator it = dst.rbegin(); it != dst.rend(); ++it) {
-    std::cout << "[pageRank value = " << it->first << "]:";
-    for (auto str : it->second) {
-      std::cout << str << " ";
+  std::ofstream summurizeOutputFile;
+  std::string path = output.c_str() + std::string("sumurize_output.txt");
+  if (!std::filesystem::exists(output)) {
+    std::filesystem::create_directory(output);
+  }
+
+  summurizeOutputFile.open(path.c_str());
+  for(std::multimap<float, std::string>::const_reverse_iterator it = dst.rbegin(); it != dst.rend(); ++it) {
+    summurizeOutputFile << "[pageRank value = " << it->first << "]:[docID=]" << it->second << "]:";
+     std::vector<std::string>* val = &sentenceList[index].get()->wordList;
+    for (auto str : *val) {
+      summurizeOutputFile << str << " ";
     }
-    std::cout << std::endl;
-    if (index > 10) 
+    summurizeOutputFile << std::endl;
+    if (index > numOutputSentence)
     {
       break;
     }
     index ++;
-      // std::cout << it -> first << " " << it -> second << std::endl; 
   }
-  // std::cout << std::endl;
-
-
-
-  return SUCCESS;
+  summurizeOutputFile.close();
 }
 
-int summurize(const std::filesystem::path& input, const std::filesystem::path& /*output*/, 
+int summurize(const std::filesystem::path& input, const std::filesystem::path& output,
               const std::filesystem::path& stopWordPath) {
   int ret = FAILURE;
-  std::vector<std::unique_ptr<Sentence>> sentenceList, sentenceOutput;
+  std::vector<std::unique_ptr<Sentence>> sentenceList;
   std::map<std::string, bool> stopWordMap;
   if (parseStopWordFile(stopWordPath, &stopWordMap) == FAILURE) {
     std::cerr << "donot use stop word..." << std::endl;
@@ -281,14 +169,31 @@ int summurize(const std::filesystem::path& input, const std::filesystem::path& /
 
   ret = parseData(input, stopWordMap, &sentenceList);
   if (ret == FAILURE) {
-    std::cout << "Can not parser data. [path=" << input.stem().string() << "]\n"; 
+    std::cout << "Can not parser data. [path=" << input.stem().string() << "]\n";
     return ret;
   }
-  
-  Graph graph;
-  graph.createGraph(sentenceList);
 
+  std::cout << "sentence vector size = " << sentenceList.size() << std::endl;
+  PageRank pageRank(&sentenceList);
+  //convert to tf-idf
+  std::vector<std::vector<float>> tfidfMattrix = pageRank.calTfidfMatrix();
+  std::cout << "tfidf matrix: row=" << tfidfMattrix.size() << std::endl;
+	std::cout << "tfidf matrix: col=" << tfidfMattrix[0].size() << std::endl;
+  //Convert TF-idf to consine
+  std::vector<std::vector<float>> consineMatrix = pageRank.tfidf2ConsineMat(tfidfMattrix, tfidfMattrix);
+  tfidfMattrix.clear();
+  //Calculate PageRank
+  size_t cosineSize = consineMatrix.size();
+  std::cout << "Consine matrix: [Row=" << cosineSize << "]\n\t\t[Col=]" << consineMatrix[0].size() << "]\n";
 
+  std::vector<float> pageRankVal(cosineSize, 1.0 / cosineSize);
+  float dampingFactor = 0.85, epsilon = 0.0000056;
+  int iterations = 100;
+  pageRank.calculatePagerank(consineMatrix, pageRankVal, dampingFactor, iterations, epsilon);
+  consineMatrix.clear();
+  //print output
+  int numOutputSentence = 10;
+  writeToFile(sentenceList, pageRankVal, numOutputSentence, output);
   return ret;
 }
 

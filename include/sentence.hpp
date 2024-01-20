@@ -1,17 +1,17 @@
-#include <iostream>
+#ifndef SENTENCE_HPP
+#define SENTENCE_HPP
+
+#include <vector>
 #include <string>
 
+const int FAILURE = 1;
+const int SUCCESS = 0;
 class Sentence {
-private:
-    std::string documentID;
-    int number;
-    // vector<std::string> content;
-    
 public:
-    Sentence();
-    ~Sentence();
-    // int parse
+  std::string docID;
+  std::vector<std::string> wordList;
+  int wdCount;
 
 };
 
-// int parseText(const std::string &path, )
+#endif

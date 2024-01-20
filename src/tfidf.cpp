@@ -54,7 +54,7 @@ void tfidf::vec2mat()
   rawDataSet.clear(); // release memory
 }
 
-inline std::vector<float> tfidf::vec_sum(const std::vector<float>& a, const std::vector<float>& b)
+inline std::vector<float> tfidf::vecSum(const std::vector<float>& a, const std::vector<float>& b)
 {
   assert(a.size() == b.size());
   std::vector<float> result;
@@ -80,7 +80,7 @@ void tfidf::calMat()
       if (dataMat2[i][j] > 1) // only keep 1 and 0
         dataMat2[i][j] = 1;
     }
-    termCount = vec_sum(termCount, dataMat2[i]); // no. of doc. each term appears
+    termCount = vecSum(termCount, dataMat2[i]); // no. of doc. each term appears
   }
   dataMat2.clear(); //release
 

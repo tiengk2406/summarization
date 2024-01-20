@@ -6,7 +6,7 @@
 
 std::string tolowerStr(std::string s)
 {
-  std::transform(s.begin(), s.end(), s.begin(), 
+  std::transform(s.begin(), s.end(), s.begin(),
                   [](unsigned char c){ return std::tolower(c); }
                 );
   return s;
@@ -44,16 +44,16 @@ void parseOneFile(const char *filePath, const std::map<std::string,bool> &stopWo
     std::getline(file, lineContent);
     // format for each line: ex
     // <s docid="AP900118-0029" num="15" wdcount="9"> ``Honecker took things into his own hands,'' Schabowski said.</s>
-    sscanf(lineContent.c_str(), "<s docid=\"%s\" num=\"%d\" wdcount=\"%d\">%s<s>", 
+    sscanf(lineContent.c_str(), "<s docid=\"%s\" num=\"%d\" wdcount=\"%d\">%s<s>",
             docID, &num, &wdCount, content);
-    
-    
+
+
     sentence->docID = docID + (std::string)("_") + std::to_string(num);
     sentence->wordList = textParse(content, " ,.`", stopWordMap);
     sentence->wdCount = wdCount;
     sentenceList->push_back(std::move(sentence));
-  } 
-  file.close();  
+  }
+  file.close();
 }
 
 int parseData(const std::filesystem::path& path, const std::map<std::string,bool> stopWordMap, std::vector<std::unique_ptr<Sentence>>* sentenceList){
@@ -70,7 +70,7 @@ int parseData(const std::filesystem::path& path, const std::map<std::string,bool
     }
 
   }
-  std::cout << "vector size = " << sentenceList->size() << std::endl; 
+  std::cout << "vector size = " << sentenceList->size() << std::endl;
   return SUCCESS;
 }
 

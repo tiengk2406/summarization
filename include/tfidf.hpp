@@ -12,11 +12,11 @@ private:
 	std::vector<std::vector<std::string>> rawDataSet; // raw data
 	std::vector<std::string> vocabList; // all terms
 	std::vector<int> numOfTerms; // used in tf calculation
-	
+
 	void createVocabList();
 	inline std::vector<float> bagOfWords2VecMN(const std::vector<std::string> & inputSet);
 	void vec2mat();
-	inline std::vector<float> vec_sum(const std::vector<float>& a, const std::vector<float>& b);
+	inline std::vector<float> vecSum(const std::vector<float>& a, const std::vector<float>& b);
 	void calMat();
 
 public:
