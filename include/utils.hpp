@@ -31,6 +31,7 @@ class utils {
   static int parseStopWordFile(const std::filesystem::path& stopWordPath, std::map<std::string, bool> *stopWordMap);
   static void writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceList, const std::vector<float>& pageRank,
                   int numOutputSentence, const std::filesystem::path& output);
+  static void printMatrix(const std::vector<std::vector<float>>& matrix);
 };
 
 #endif

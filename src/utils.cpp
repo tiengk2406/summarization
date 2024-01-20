@@ -130,3 +130,15 @@ void utils::writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceLi
   }
   summurizeOutputFile.close();
 }
+
+void utils::printMatrix(const std::vector<std::vector<float>>& matrix) {
+  size_t nrow = matrix.size();
+  size_t ncol = matrix[0].size();
+  std::cout << "Print TFIDF matrix[" << nrow << "][" << ncol << "]\n";
+  for (unsigned int i = 0; i < nrow; i++) {
+    for (unsigned int j = 0; j < ncol; j++) {
+      std::cout << matrix[i][j] << "    ";
+    }
+    std::cout << std::endl;
+  }
+}

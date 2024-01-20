@@ -40,6 +40,7 @@ int summurize(const std::filesystem::path& input, const std::filesystem::path& o
   //Calculate PageRank
   size_t cosineSize = consineMatrix.size();
   std::cout << "Consine matrix: [Row=" << cosineSize << "]\n\t\t[Col=" << consineMatrix[0].size() << "]\n";
+  utils::printMatrix(consineMatrix);
 
   std::vector<float> pageRankVal(cosineSize, 1.0 / cosineSize);
   float dampingFactor = 0.85, epsilon = EPSILON;
