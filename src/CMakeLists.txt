@@ -12,7 +12,7 @@ set(PROJ_SRCS
   ${PROJECT_SOURCE_DIR}/main.cpp
   ${PROJECT_SOURCE_DIR}/tfidf.cpp
   ${PROJECT_SOURCE_DIR}/pageRank.cpp
-  # ${PROJECT_SOURCE_DIR}/utils.cpp
+  ${PROJECT_SOURCE_DIR}/utils.cpp
 )
 add_executable(${output} ${PROJ_SRCS})
 target_link_libraries(${output} stdc++ -lpthread)

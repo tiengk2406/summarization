@@ -4,7 +4,7 @@
 
 #include "utils.hpp"
 
-std::string tolowerStr(std::string s)
+std::string utils::tolowerStr(std::string s)
 {
   std::transform(s.begin(), s.end(), s.begin(),
                   [](unsigned char c){ return std::tolower(c); }
@@ -12,52 +12,56 @@ std::string tolowerStr(std::string s)
   return s;
 }
 
-std::vector<std::string> textParse(const std::string & bigString, const std::string& delimiter, std::map<std::string,bool>& stopWordMap) {
-  size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+std::vector<std::string> utils::textParse(const std::string & bigString, const std::string& delimiter, std::map<std::string,bool>& stopWordMap) {
   std::string token;
   std::vector<std::string> res;
+  size_t beg, pos = 0;
+  while ((beg = bigString.find_first_not_of(delimiter, pos)) != std::string::npos)
+  {
+    pos = bigString.find_first_of(delimiter, beg + 1);
+    token = tolowerStr(bigString.substr(beg, pos - beg));
+    if (stopWordMap[token] == true) {
+      continue;
+    }
 
-  while ((pos_end = bigString.find_first_of(delimiter, pos_start)) != std::string::npos) {
-      token = bigString.substr (pos_start, pos_end - pos_start);
-      pos_start = pos_end + delim_len;
-      token.erase(remove(token.begin(), token.end(), ' '), token.end());
-      token = tolowerStr(token);
-      if (stopWordMap[token] == true) {
-        continue;
-      }
-
-      res.push_back(token);
+    res.push_back(token);
   }
 
-  res.push_back(bigString.substr(pos_start));
   return res;
 }
 
-void parseOneFile(const char *filePath, const std::map<std::string,bool> &stopWordMap, std::vector<std::unique_ptr<Sentence>>* sentenceList) {
+void utils::parseOneFile(const char *filePath, std::map<std::string,bool> stopWordMap, std::vector<std::unique_ptr<Sentence>>* sentenceList) {
   std::ifstream file;
   file.open(filePath, std::ifstream::in);
+  std::cout << "File name for training: "<< filePath << std::endl;
   while (!file.eof()) {
     std::unique_ptr<Sentence> sentence = std::make_unique<Sentence>();
     std::string lineContent;
     char docID[200] = {}, content[5000] = {};
     int num = 0, wdCount = 0;
     std::getline(file, lineContent);
-    // format for each line: ex
+    // format for each line: ex  " \"%[^\"]\"",
     // <s docid="AP900118-0029" num="15" wdcount="9"> ``Honecker took things into his own hands,'' Schabowski said.</s>
-    sscanf(lineContent.c_str(), "<s docid=\"%s\" num=\"%d\" wdcount=\"%d\">%s<s>",
+    sscanf(lineContent.c_str(), "<s docid=\"%100[^\"]\" num=\"%d\" wdcount=\"%d\">%[^\n]s</s>",
             docID, &num, &wdCount, content);
-
-
+    if (wdCount <= 5 || std::strlen(content) <= 10) {
+      continue;
+    }
+    // remove </s>
+    if (std::strlen(content) > 4)
+      content[std::strlen(content) - 4] = 0;
     sentence->docID = docID + (std::string)("_") + std::to_string(num);
-    sentence->wordList = textParse(content, " ,.`", stopWordMap);
+    sentence->wordList = textParse(content, {" .,:;!?`"}, stopWordMap);
+
     sentence->wdCount = wdCount;
     sentenceList->push_back(std::move(sentence));
   }
   file.close();
 }
 
-int parseData(const std::filesystem::path& path, const std::map<std::string,bool> stopWordMap, std::vector<std::unique_ptr<Sentence>>* sentenceList){
+int utils::parseData(const std::filesystem::path& path, std::map<std::string,bool> stopWordMap, std::vector<std::unique_ptr<Sentence>>* sentenceList){
   int result = FAILURE;
+  std::cout << "Path for training: " << path.c_str() << std::endl;
   result = std::filesystem::exists(path);
   if (result) {
     for (const auto& entry : std::filesystem::directory_iterator(path)) {
@@ -70,11 +74,11 @@ int parseData(const std::filesystem::path& path, const std::map<std::string,bool
     }
 
   }
-  std::cout << "vector size = " << sentenceList->size() << std::endl;
+
   return SUCCESS;
 }
 
-int parseStopWordFile(const std::filesystem::path& stopWordPath, std::map<std::string, bool> *stopWordMap) {
+int utils::parseStopWordFile(const std::filesystem::path& stopWordPath, std::map<std::string, bool> *stopWordMap) {
   if (!std::filesystem::exists(stopWordPath)) {
     std::cerr << "[path=" << stopWordPath.c_str() << "] did not exist\n";
     return FAILURE;
@@ -94,3 +98,35 @@ int parseStopWordFile(const std::filesystem::path& stopWordPath, std::map<std::s
   return SUCCESS;
 }
 
+void utils::writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceList, const std::vector<float>& pageRank,
+                  int numOutputSentence, const std::filesystem::path& output) {
+  std::map<std::string, float> resultMap;
+  size_t size = pageRank.size();
+  for (size_t i = 0; i < size; ++i) {
+    resultMap.insert({sentenceList[i].get()->docID, pageRank[i]});
+  }
+  std::multimap<float, std::string> dst = utils::flip_map(resultMap);
+
+  int index = 0;
+  std::ofstream summurizeOutputFile;
+  std::string path = output.c_str() + std::string("sumurize_output.txt");
+  if (!std::filesystem::exists(output)) {
+    std::filesystem::create_directory(output);
+  }
+  std::cout << "\nOutput to file : " <<  path << std::endl;
+  summurizeOutputFile.open(path.c_str());
+  for(std::multimap<float, std::string>::const_reverse_iterator it = dst.rbegin(); it != dst.rend(); ++it) {
+    summurizeOutputFile << "[pageRank value = " << it->first << "]:[docID=]" << it->second << "]:";
+     std::vector<std::string>* val = &sentenceList[index].get()->wordList;
+    for (auto str : *val) {
+      summurizeOutputFile << str << " ";
+    }
+    summurizeOutputFile << std::endl;
+    if (index > numOutputSentence)
+    {
+      break;
+    }
+    index ++;
+  }
+  summurizeOutputFile.close();
+}

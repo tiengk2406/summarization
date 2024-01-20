@@ -14,8 +14,6 @@
 
 class PageRank {
   private:
-
-    int numOfWord;
     std::vector<std::unique_ptr<Sentence>>* sentenceList;
     int convertDoc2Vec(const std::string docMem);
     float cosineSimilarity(const float* MatA, const float*  MatB, size_t lengh);
@@ -23,7 +21,6 @@ class PageRank {
 
   public:
     PageRank() {
-      numOfWord = 0;
       sentenceList = nullptr;
     }
 
