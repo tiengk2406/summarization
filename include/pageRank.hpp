@@ -33,8 +33,8 @@ class PageRank {
 
     std::vector<std::vector<float>> calTfidfMatrix();
     std::vector<std::vector<float>> tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMat, const std::vector<std::vector<float>> &tfidfMat1);
-    void calculatePagerank(std::vector<std::vector<float>>& graph, std::vector<float>& pagerank, float dampingFactor, int iterations, float epsilon);
-
+    void calculatePagerank(std::vector<std::vector<int>>& graph, std::vector<float>& pagerank, float dampingFactor, int iterations, float epsilon);
+    std::vector<std::vector<int>> createLinkMatrix(const std::vector<std::vector<float>>& cosineMatrix, float threshold);
 };
 
 #endif

@@ -3,7 +3,7 @@
 
 const int NUM_OF_SENTENCES_OUT = 10;
 const float EPSILON = 0.00000056;
-
+const float THRESHOLD_PAGE_RANK = 0.3666;
 int summurize(const std::filesystem::path& input, const std::filesystem::path& output,
               const std::filesystem::path& stopWordPath) {
   int ret = FAILURE;
@@ -31,13 +31,16 @@ int summurize(const std::filesystem::path& input, const std::filesystem::path& o
   //Calculate PageRank
   size_t cosineSize = consineMatrix.size();
   std::cout << "Consine matrix: [Row=" << cosineSize << "]\n\t\t[Col=" << consineMatrix[0].size() << "]\n";
-  utils::printMatrix(consineMatrix);
 
+  //Convert to linkMatrix
+  std::vector<std::vector<int>> linkMatrix = pageRank.createLinkMatrix(consineMatrix, THRESHOLD_PAGE_RANK);
+  consineMatrix.clear();
+  utils::printMatrix(linkMatrix);
   std::vector<float> pageRankVal(cosineSize, 1.0 / cosineSize);
   float dampingFactor = 0.85, epsilon = EPSILON;
   int iterations = 100;
-  pageRank.calculatePagerank(consineMatrix, pageRankVal, dampingFactor, iterations, epsilon);
-  consineMatrix.clear();
+  pageRank.calculatePagerank(linkMatrix, pageRankVal, dampingFactor, iterations, epsilon);
+  linkMatrix.clear();
   //print output
   int numOutputSentence = NUM_OF_SENTENCES_OUT;
   utils::writeToFile(sentenceList, pageRankVal, numOutputSentence, output);

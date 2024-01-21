@@ -1,12 +1,12 @@
-[pageRank value = 0.00136178]:[docID=]AP880817-0040_13]:explosion today flattened military barracks tore nearby homes killing 11 people injuring 22 police said 
-[pageRank value = 0.00136178]:[docID=]AP880324-0193_16]:blast occurred 8 26 m lounge barracks near deal 70 miles southeast london defense ministry said 
-[pageRank value = 0.00136178]:[docID=]AP880324-0193_14]:defense ministry said seven missing 
-[pageRank value = 0.00136178]:[docID=]AP880314-0110_8]:dozens homes near school damaged including four destroyed 
-[pageRank value = 0.00136178]:[docID=]AP880915-0003_19]:ira claimed responsibility blast 
-[pageRank value = 0.00136178]:[docID=]AP880915-0003_18]:statement telephoned ireland international dublin news agency said visited royal marines kent'' response prime minister margaret thatcher's visit northern ireland nine days ago 
-[pageRank value = 0.00136178]:[docID=]AP880915-0003_24]:defense secretary tom king inspecting wreckage said yet absolutely confirmed bomb evidence quite clearly ira atrocity'' 
-[pageRank value = 0.00136178]:[docID=]AP880915-0003_51]:scotland yard said forensic team anti-terrorist squad called help investigate 
-[pageRank value = 0.00136178]:[docID=]AP880915-0003_46]:police investigating attack searching nearby house rented briefly three men irish accents 
-[pageRank value = 0.00136178]:[docID=]AP881114-0006_10]:raymond kendall secretary- general international police organization interpol pledged organization's full support hunt blew school 
-[pageRank value = 0.00136178]:[docID=]AP881114-0006_31]:authorities high alert expecting ira attacks connection last month's 20th anniversary introduction british troops northern ireland 
-[pageRank value = 0.00136178]:[docID=]AP890323-0234_15]:friday's attack worst mainland since virtually simultaneous bombings july 1982 directed ceremonial military units london's hyde park regent's park 
+[pageRank value = 0.001436]:[docID=]AP900129-0036_9]:explosion today flattened military barracks tore nearby homes killing 11 people injuring 22 police said 
+[pageRank value = 0.00141499]:[docID=]AP890923-0012_21]:blast occurred 8 26 m lounge barracks near deal 70 miles southeast london defense ministry said 
+[pageRank value = 0.00140447]:[docID=]AP890925-0124_7]:defense ministry said seven missing 
+[pageRank value = 0.00140439]:[docID=]AP880915-0003_13]:dozens homes near school damaged including four destroyed 
+[pageRank value = 0.00139388]:[docID=]AP900129-0036_10]:ira claimed responsibility blast 
+[pageRank value = 0.0013938]:[docID=]AP880915-0003_45]:statement telephoned ireland international dublin news agency said visited royal marines kent'' response prime minister margaret thatcher's visit northern ireland nine days ago 
+[pageRank value = 0.0013938]:[docID=]AP880915-0003_62]:defense secretary tom king inspecting wreckage said yet absolutely confirmed bomb evidence quite clearly ira atrocity'' 
+[pageRank value = 0.00139372]:[docID=]LA021290-0043_9]:scotland yard said forensic team anti-terrorist squad called help investigate 
+[pageRank value = 0.00139372]:[docID=]AP890615-0263_7]:police investigating attack searching nearby house rented briefly three men irish accents 
+[pageRank value = 0.00139372]:[docID=]FT923-5068_10]:raymond kendall secretary- general international police organization interpol pledged organization's full support hunt blew school 
+[pageRank value = 0.00139372]:[docID=]AP890922-0117_30]:authorities high alert expecting ira attacks connection last month's 20th anniversary introduction british troops northern ireland 
+[pageRank value = 0.00139363]:[docID=]AP901008-0136_10]:friday's attack worst mainland since virtually simultaneous bombings july 1982 directed ceremonial military units london's hyde park regent's park 

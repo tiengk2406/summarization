@@ -1,16 +1,16 @@
 #include "pageRank.hpp"
 #include "tfidf.hpp"
 
-void PageRank::calculatePagerank(std::vector<std::vector<float>>& graph, std::vector<float>& pagerank, float dampingFactor, int iterations, float epsilon) {
-  int numPages = graph.size();
+void PageRank::calculatePagerank(std::vector<std::vector<int>>& linkMatrix, std::vector<float>& pagerank, float dampingFactor, int iterations, float epsilon) {
+  int numPages = linkMatrix.size();
   std::vector<float> newPagerank(numPages, 1.0 / numPages);
 
   for (int iter = 0; iter < iterations; ++iter) {
     for (int i = 0; i < numPages; ++i) {
       float incomingPR = 0.0;
       for (int j = 0; j < numPages; ++j) {
-        if (graph[j][i] == 1) {
-          incomingPR += pagerank[j] / static_cast<float>(graph[j].size());
+        if (linkMatrix[j][i] == 1) {
+          incomingPR += pagerank[j] / static_cast<float>(linkMatrix[j].size());
         }
       }
       newPagerank[i] = (1.0 - dampingFactor) / numPages + dampingFactor * incomingPR;
@@ -79,5 +79,23 @@ std::vector<std::vector<float>> PageRank::calTfidfMatrix() {
   }
 
   tfidf ins(data);
+  // ins.printMat();
   return ins.weightMat;
+}
+
+std::vector<std::vector<int>> PageRank::createLinkMatrix(const std::vector<std::vector<float>>& cosineMatrix, float threshold) {
+  size_t numRows = cosineMatrix.size();
+  size_t numCols = cosineMatrix[0].size();
+
+  std::vector<std::vector<int>> linkMatrix(numRows, std::vector<int>(numCols, 0));
+
+  for (size_t i = 0; i < numRows; ++i) {
+    for (size_t j = 0; j < numCols; ++j) {
+      if (cosineMatrix[i][j] >= threshold) {
+        linkMatrix[i][j] = 1;  // link
+      }
+    }
+  }
+
+  return linkMatrix;
 }
