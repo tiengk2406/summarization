@@ -90,9 +90,10 @@ std::vector<std::vector<int>> PageRank::createLinkMatrix(const std::vector<std::
   std::vector<std::vector<int>> linkMatrix(numRows, std::vector<int>(numCols, 0));
 
   for (size_t i = 0; i < numRows; ++i) {
-    for (size_t j = 0; j < numCols; ++j) {
+    for (size_t j = i; j < numCols; ++j) {
       if (cosineMatrix[i][j] >= threshold) {
         linkMatrix[i][j] = 1;  // link
+        linkMatrix[j][i] = linkMatrix[i][j];
       }
     }
   }

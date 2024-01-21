@@ -1,12 +1,12 @@
-[pageRank value = 8.53449e-05]:[docID=]AP880912-0095_32]:explosion rocked royal marines school music southeastern coastal town today causing one building collapse killing eight people officials said 
-[pageRank value = 8.53449e-05]:[docID=]AP900622-0080_32]:thirty people injured 18 missing feared trapped rubble 
-[pageRank value = 8.53449e-05]:[docID=]AP900623-0009_23]:blast occurred 8 26 m lounge barracks near deal 70 miles southeast london defense ministry said 
-[pageRank value = 8.53449e-05]:[docID=]WSJ880912-0064_10]:building collapsed '' said ministry spokesman speaking anonymously keeping british custom 
-[pageRank value = 8.53446e-05]:[docID=]AP890923-0091_13]:we've idea cause blast moment 
-[pageRank value = 8.53446e-05]:[docID=]AP890924-0025_18]:early tell'' 
-[pageRank value = 8.53033e-05]:[docID=]AP880912-0137_38]:scotland yard said forensic team anti-terrorist squad called help investigate 
-[pageRank value = 8.53033e-05]:[docID=]AP890922-0103_34]:firefighters used heavy lifting equipment thermal cameras search trapped debris said kent fire brigade spokesman kevin simmons 
-[pageRank value = 8.53033e-05]:[docID=]LA092389-0092_32]:kent police said 17 18 people trapped 
-[pageRank value = 8.53031e-05]:[docID=]AP890922-0071_17]:defense ministry said seven missing 
-[pageRank value = 8.53031e-05]:[docID=]AP890922-0117_28]:ten doctors gave emergency treatment scene 11 ambulances took injured two hospitals ambulance service said 
-[pageRank value = 8.53031e-05]:[docID=]LA092389-0092_29]:suffering flash burns head arms fractures sort injuries would expect explosion '' said spokesman buckland hospital dover 20 miles south deal 
+[pageRank value = 8.547e-05]:[docID=]AP890923-0091_10]:explosion rocked royal marines school music southeastern coastal town today causing one building collapse killing eight people officials said
+[pageRank value = 8.53458e-05]:[docID=]AP880912-0095_32]:thirty people injured 18 missing feared trapped rubble
+[pageRank value = 8.53458e-05]:[docID=]AP880912-0137_38]:blast occurred 8 26 m lounge barracks near deal 70 miles southeast london defense ministry said
+[pageRank value = 8.53458e-05]:[docID=]WSJ880912-0064_10]:building collapsed '' said ministry spokesman speaking anonymously keeping british custom
+[pageRank value = 8.53034e-05]:[docID=]AP890922-0103_34]:we've idea cause blast moment
+[pageRank value = 8.53034e-05]:[docID=]AP890922-0103_33]:early tell''
+[pageRank value = 8.53034e-05]:[docID=]AP890922-0103_32]:scotland yard said forensic team anti-terrorist squad called help investigate
+[pageRank value = 8.53034e-05]:[docID=]AP890922-0117_49]:firefighters used heavy lifting equipment thermal cameras search trapped debris said kent fire brigade spokesman kevin simmons
+[pageRank value = 8.53034e-05]:[docID=]AP890922-0117_48]:kent police said 17 18 people trapped
+[pageRank value = 8.53034e-05]:[docID=]AP890922-0117_47]:defense ministry said seven missing
+[pageRank value = 8.53034e-05]:[docID=]AP890923-0012_41]:ten doctors gave emergency treatment scene 11 ambulances took injured two hospitals ambulance service said
+[pageRank value = 8.53034e-05]:[docID=]AP890923-0091_13]:suffering flash burns head arms fractures sort injuries would expect explosion '' said spokesman buckland hospital dover 20 miles south deal

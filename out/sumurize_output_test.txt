@@ -1,12 +1,12 @@
-[pageRank value = 0.00104556]:[docID=]AP900129-0071_10]:former east german leader erich honecker may moved monastery protect possible lynching enraged citizens newspaper said wednesday 
-[pageRank value = 0.00103951]:[docID=]AP900129-0036_16]:front-page story mass-circulation bild newspaper said lynch danger _ church wants grant honecker asylum'' 
-[pageRank value = 0.00103951]:[docID=]AP900129-0036_15]:since honecker ousted oct 18 former communist party leader party officials come investigation charges corruption living luxury cost state 
-[pageRank value = 0.00103951]:[docID=]AP900129-0036_14]:december seven former politburo members arrested honecker placed house arrest government housing area wandlitz outside east berlin 
-[pageRank value = 0.00103951]:[docID=]AP900129-0036_18]:wandlitz homes including one honecker still lives converted medical rehabilitation center children 
-[pageRank value = 0.00103951]:[docID=]AP900129-0071_26]:honecker expected forced compound february 
-[pageRank value = 0.00103951]:[docID=]AP900129-0071_25]:bild said information lutheran catholic church sources offered honecker _ threated public rage _ protection refuge'' 
-[pageRank value = 0.00103951]:[docID=]AP900129-0071_24]:possibility protect erich honecker rage east german people '' bild quoted source saying 
-[pageRank value = 0.00103951]:[docID=]AP900129-0071_28]:churches became venues gathering pro-democracy groups eventually brought overthrow 18-year leadership 
-[pageRank value = 0.00103947]:[docID=]AP900129-0071_27]:recent weeks east german groups called punishing honecker moving smaller quarters outside toilet '' bild said 
-[pageRank value = 0.00103947]:[docID=]AP900129-0036_10]:current leadership fears situation honecker might attacked become victim lynch justice '' bild said 
-[pageRank value = 0.00103947]:[docID=]AP900129-0036_12]:honecker 77 underwent gall-bladder surgery august east german media reported remains seriously ill 
+[pageRank value = 0.00104569]:[docID=]AP900118-0029_33]:former east german leader erich honecker may moved monastery protect possible lynching enraged citizens newspaper said wednesday
+[pageRank value = 0.00104569]:[docID=]AP900129-0036_10]:front-page story mass-circulation bild newspaper said lynch danger _ church wants grant honecker asylum''
+[pageRank value = 0.00104569]:[docID=]AP900129-0071_10]:since honecker ousted oct 18 former communist party leader party officials come investigation charges corruption living luxury cost state
+[pageRank value = 0.00103951]:[docID=]AP900129-0036_18]:december seven former politburo members arrested honecker placed house arrest government housing area wandlitz outside east berlin
+[pageRank value = 0.00103951]:[docID=]AP900129-0036_17]:wandlitz homes including one honecker still lives converted medical rehabilitation center children
+[pageRank value = 0.00103951]:[docID=]AP900129-0036_16]:honecker expected forced compound february
+[pageRank value = 0.00103951]:[docID=]AP900129-0036_15]:bild said information lutheran catholic church sources offered honecker _ threated public rage _ protection refuge''
+[pageRank value = 0.00103951]:[docID=]AP900129-0036_14]:possibility protect erich honecker rage east german people '' bild quoted source saying
+[pageRank value = 0.00103951]:[docID=]AP900129-0071_28]:churches became venues gathering pro-democracy groups eventually brought overthrow 18-year leadership
+[pageRank value = 0.00103951]:[docID=]AP900129-0071_27]:recent weeks east german groups called punishing honecker moving smaller quarters outside toilet '' bild said
+[pageRank value = 0.00103951]:[docID=]AP900129-0071_26]:current leadership fears situation honecker might attacked become victim lynch justice '' bild said
+[pageRank value = 0.00103951]:[docID=]AP900129-0071_25]:honecker 77 underwent gall-bladder surgery august east german media reported remains seriously ill
