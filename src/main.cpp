@@ -3,7 +3,8 @@
 
 const int NUM_OF_SENTENCES_OUT = 10;
 const float EPSILON = 0.00000056;
-const float THRESHOLD_PAGE_RANK = 0.3666;
+const float THRESHOLD_PAGE_RANK = 0.85;
+
 int summurize(const std::filesystem::path& input, const std::filesystem::path& output,
               const std::filesystem::path& stopWordPath) {
   int ret = FAILURE;
