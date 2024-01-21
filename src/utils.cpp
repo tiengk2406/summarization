@@ -117,16 +117,24 @@ void utils::writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceLi
   summurizeOutputFile.open(path.c_str());
   for(std::multimap<float, std::string>::const_reverse_iterator it = dst.rbegin(); it != dst.rend(); ++it) {
     summurizeOutputFile << "[pageRank value = " << it->first << "]:[docID=]" << it->second << "]:";
-     std::vector<std::string>* val = &sentenceList[index].get()->wordList;
+    int sentence_index = 0;
+    for (size_t i = 0; i < sentenceList.size(); ++i) {
+      if (sentenceList[i].get()->docID == it->second) {
+        sentence_index = i;
+        break;
+      }
+    }
+
+    std::vector<std::string>* val = &sentenceList[sentence_index].get()->wordList;
     for (auto str : *val) {
       summurizeOutputFile << str << " ";
     }
     summurizeOutputFile << std::endl;
-    if (index > numOutputSentence)
+    if (index < numOutputSentence)
     {
+      index++;
+    } else
       break;
-    }
-    index ++;
   }
   summurizeOutputFile.close();
 }
