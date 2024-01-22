@@ -99,7 +99,7 @@ int utils::parseStopWordFile(const std::filesystem::path& stopWordPath, std::map
 }
 
 void utils::writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceList, const std::vector<float>& pageRank,
-                  int numOutputSentence, const std::filesystem::path& output) {
+                  int numOutputSentence, const std::string& path) {
   std::map<std::string, float> resultMap;
   size_t size = pageRank.size();
   for (size_t i = 0; i < size; ++i) {
@@ -109,14 +109,10 @@ void utils::writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceLi
 
   int index = 0;
   std::ofstream summurizeOutputFile;
-  std::string path = output.c_str() + std::string("sumurize_output.txt");
-  if (!std::filesystem::exists(output)) {
-    std::filesystem::create_directory(output);
-  }
   std::cout << "\nOutput to file : " <<  path << std::endl;
   summurizeOutputFile.open(path.c_str());
   for(std::multimap<float, std::string>::const_reverse_iterator it = dst.rbegin(); it != dst.rend(); ++it) {
-    summurizeOutputFile << "[pageRank value = " << it->first << "]:[docID=]" << it->second << "]:";
+    summurizeOutputFile << "[docID=" << it->second << "]:";
     int sentence_index = 0;
     for (size_t i = 0; i < sentenceList.size(); ++i) {
       if (sentenceList[i].get()->docID == it->second) {

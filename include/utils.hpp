@@ -42,7 +42,7 @@ class utils {
   static int parseData(const std::filesystem::path& path, std::map<std::string,bool> stopWordMap, std::vector<std::unique_ptr<Sentence>>* sentenceList);
   static int parseStopWordFile(const std::filesystem::path& stopWordPath, std::map<std::string, bool> *stopWordMap);
   static void writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceList, const std::vector<float>& pageRank,
-                  int numOutputSentence, const std::filesystem::path& output);
+                  int numOutputSentence, const std::string& path);
 
 };
 

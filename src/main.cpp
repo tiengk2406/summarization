@@ -8,43 +8,56 @@ const float THRESHOLD_PAGE_RANK = 0.1;
 int summurize(const std::filesystem::path& input, const std::filesystem::path& output,
               const std::filesystem::path& stopWordPath) {
   int ret = FAILURE;
-  std::vector<std::unique_ptr<Sentence>> sentenceList;
   std::map<std::string, bool> stopWordMap;
+  std::vector<std::unique_ptr<Sentence>> sentenceList;
   if (utils::parseStopWordFile(stopWordPath, &stopWordMap) == FAILURE) {
     std::cerr << "donot use stop word..." << std::endl;
   }
 
-  ret = utils::parseData(input, stopWordMap, &sentenceList);
-  if (ret == FAILURE) {
-    std::cout << "Can not parser data. [path=" << input.stem().string() << "]\n";
-    return ret;
+  if (!std::filesystem::exists(output)) {
+    std::filesystem::create_directory(output);
   }
 
-  std::cout << "sentence vector size = " << sentenceList.size() << std::endl;
-  PageRank pageRank(&sentenceList);
-  //convert to tf-idf
-  std::vector<std::vector<float>> tfidfMattrix = pageRank.calTfidfMatrix();
-  std::cout << "tfidf matrix: row=" << tfidfMattrix.size() << std::endl;
-	std::cout << "tfidf matrix: col=" << tfidfMattrix[0].size() << std::endl;
-  //Convert TF-idf to consine
-  std::vector<std::vector<float>> consineMatrix = pageRank.tfidf2ConsineMat(tfidfMattrix, tfidfMattrix);
-  tfidfMattrix.clear();
-  //Calculate PageRank
-  size_t cosineSize = consineMatrix.size();
-  std::cout << "Consine matrix: [Row=" << cosineSize << "]\n\t\t[Col=" << consineMatrix[0].size() << "]\n";
+  for (const auto& entry : std::filesystem::directory_iterator(input)) {
+    if (std::filesystem::is_directory(entry.path())) {
+      std::cout << entry.path().c_str() << " is a directory. skip it\n";
+      continue;
+    }
+    std::cout << "Path for training: " << entry.path().c_str() << std::endl;
+    utils::parseOneFile(entry.path().c_str(), stopWordMap, &sentenceList);
+    std::cout << "sentence vector size = " << sentenceList.size() << std::endl;
+    PageRank pageRank(&sentenceList);
+    //convert to tf-idf
+    std::vector<std::vector<float>> tfidfMattrix = pageRank.calTfidfMatrix();
+    std::cout << "tfidf matrix: row=" << tfidfMattrix.size() << std::endl;
+    std::cout << "tfidf matrix: col=" << tfidfMattrix[0].size() << std::endl;
+    //Convert TF-idf to consine
+    std::vector<std::vector<float>> consineMatrix = pageRank.tfidf2ConsineMat(tfidfMattrix, tfidfMattrix);
+    tfidfMattrix.clear();
+    //Calculate PageRank
+    size_t cosineSize = consineMatrix.size();
+    std::cout << "Consine matrix: [Row=" << cosineSize << "]\n\t\t[Col=" << consineMatrix[0].size() << "]\n";
 
-  //Convert to linkMatrix
-  std::vector<std::vector<int>> linkMatrix = pageRank.createLinkMatrix(consineMatrix, THRESHOLD_PAGE_RANK);
-  consineMatrix.clear();
-  utils::printMatrix(linkMatrix);
-  std::vector<float> pageRankVal(cosineSize, 1.0 / cosineSize);
-  float dampingFactor = 0.85, epsilon = EPSILON;
-  int iterations = 100;
-  pageRank.calculatePagerank(linkMatrix, pageRankVal, dampingFactor, iterations, epsilon);
-  linkMatrix.clear();
-  //print output
-  int numOutputSentence = NUM_OF_SENTENCES_OUT;
-  utils::writeToFile(sentenceList, pageRankVal, numOutputSentence, output);
+    //Convert to linkMatrix
+    std::vector<std::vector<int>> linkMatrix = pageRank.createLinkMatrix(consineMatrix, THRESHOLD_PAGE_RANK);
+    consineMatrix.clear();
+    utils::printMatrix(linkMatrix);
+    std::vector<float> pageRankVal(cosineSize, 1.0 / cosineSize);
+    float dampingFactor = 0.85, epsilon = EPSILON;
+    int iterations = 100;
+    pageRank.calculatePagerank(linkMatrix, pageRankVal, dampingFactor, iterations, epsilon);
+    linkMatrix.clear();
+    //print output
+    int numOutputSentence = NUM_OF_SENTENCES_OUT;
+    std::string fileOut = output.c_str() + (std::string)"/" + entry.path().stem().c_str();
+    utils::writeToFile(sentenceList, pageRankVal, numOutputSentence, fileOut);
+    sentenceList.clear();
+  }
+
+
+
+
+
   return ret;
 }
 
