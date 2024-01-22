@@ -31,10 +31,14 @@ class PageRank {
 
     }
 
+    std::vector<float> calCentroid(const std::vector<std::vector<float>>& data);
     std::vector<std::vector<float>> calTfidfMatrix();
     std::vector<std::vector<float>> tfidf2ConsineMat(const std::vector<std::vector<float>> &tfidfMat, const std::vector<std::vector<float>> &tfidfMat1);
     void calculatePagerank(std::vector<std::vector<int>>& graph, std::vector<float>& pagerank, float dampingFactor, int iterations, float epsilon);
     std::vector<std::vector<int>> createLinkMatrix(const std::vector<std::vector<float>>& cosineMatrix, float threshold);
+    void calculateCompositeScore(const std::vector<float>& centroid, const std::vector<std::vector<float>>& tfidfMatrix,
+                                 const std::vector<float>& pageRankScore, float alpha, std::vector<float>& result);
+
 };
 
 #endif

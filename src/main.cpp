@@ -31,32 +31,44 @@ int summurize(const std::filesystem::path& input, const std::filesystem::path& o
     std::vector<std::vector<float>> tfidfMattrix = pageRank.calTfidfMatrix();
     std::cout << "tfidf matrix: row=" << tfidfMattrix.size() << std::endl;
     std::cout << "tfidf matrix: col=" << tfidfMattrix[0].size() << std::endl;
+
+    // calculated centroid
+    std::vector<float> centroid = pageRank.calCentroid(tfidfMattrix);
+
     //Convert TF-idf to consine
     std::vector<std::vector<float>> consineMatrix = pageRank.tfidf2ConsineMat(tfidfMattrix, tfidfMattrix);
-    tfidfMattrix.clear();
+    // tfidfMattrix.clear();
     //Calculate PageRank
     size_t cosineSize = consineMatrix.size();
     std::cout << "Consine matrix: [Row=" << cosineSize << "]\n\t\t[Col=" << consineMatrix[0].size() << "]\n";
 
     //Convert to linkMatrix
     std::vector<std::vector<int>> linkMatrix = pageRank.createLinkMatrix(consineMatrix, THRESHOLD_PAGE_RANK);
-    consineMatrix.clear();
+
     utils::printMatrix(linkMatrix);
     std::vector<float> pageRankVal(cosineSize, 1.0 / cosineSize);
     float dampingFactor = 0.85, epsilon = EPSILON;
     int iterations = 100;
     pageRank.calculatePagerank(linkMatrix, pageRankVal, dampingFactor, iterations, epsilon);
-    linkMatrix.clear();
+
+    std::vector<float> pageRankAndRadVal;
+    float alpha = 0.2;
+    pageRank.calculateCompositeScore(centroid, tfidfMattrix, pageRankVal, alpha, pageRankAndRadVal);
+
     //print output
     int numOutputSentence = NUM_OF_SENTENCES_OUT;
     std::string fileOut = output.c_str() + (std::string)"/" + entry.path().stem().c_str();
-    utils::writeToFile(sentenceList, pageRankVal, numOutputSentence, fileOut);
+    utils::writeToFile(sentenceList, pageRankAndRadVal, numOutputSentence, fileOut);
+    // utils::writeToFile(sentenceList, pageRankVal, numOutputSentence, fileOut);
+
     sentenceList.clear();
+    tfidfMattrix.clear();
+    pageRankVal.clear();
+    consineMatrix.clear();
+    linkMatrix.clear();
+    centroid.clear();
+    pageRankAndRadVal.clear();
   }
-
-
-
-
 
   return ret;
 }

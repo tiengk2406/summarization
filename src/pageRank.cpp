@@ -100,3 +100,30 @@ std::vector<std::vector<int>> PageRank::createLinkMatrix(const std::vector<std::
 
   return linkMatrix;
 }
+
+std::vector<float> PageRank::calCentroid(const std::vector<std::vector<float>>& data) {
+  int nrow = data.size();
+  int ncol = data[0].size();
+  std::vector<float> ret;
+  for (int i = 0; i < ncol; ++i) {
+    float val = 0.0;
+    for (int j = 0; j < nrow; ++j) {
+      val += data[j][i];
+    }
+
+    ret.push_back(val / nrow);
+  }
+
+  return ret;
+}
+
+void PageRank::calculateCompositeScore(const std::vector<float>& centroid, const std::vector<std::vector<float>>& tfidfMatrix,
+                                       const std::vector<float>& pageRankScore, float alpha, std::vector<float>& ret) {
+  // cal cosine from tfidf to centail
+  size_t size = pageRankScore.size();
+  for (size_t i = 0; i < size; ++i) {
+    float consineVal = cosineSimilarity(tfidfMatrix[i].data(), centroid.data(), centroid.size());
+    float val = alpha * consineVal + (1 - alpha) * pageRankScore[i];
+    ret.push_back(val);
+  }
+}
