@@ -112,7 +112,14 @@ void utils::writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceLi
   std::cout << "\nOutput to file : " <<  path << std::endl;
   summurizeOutputFile.open(path.c_str());
   for(std::multimap<float, std::string>::const_reverse_iterator it = dst.rbegin(); it != dst.rend(); ++it) {
-    summurizeOutputFile << "[docID=" << it->second << "]:";
+    if (index < numOutputSentence)
+    {
+      index++;
+    } else {
+      break;
+    }
+
+    summurizeOutputFile << "[docID=" << it->second << "]";
     int sentence_index = 0;
     for (size_t i = 0; i < sentenceList.size(); ++i) {
       if (sentenceList[i].get()->docID == it->second) {
@@ -126,11 +133,7 @@ void utils::writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceLi
       summurizeOutputFile << str << " ";
     }
     summurizeOutputFile << std::endl;
-    if (index < numOutputSentence)
-    {
-      index++;
-    } else
-      break;
+
   }
   summurizeOutputFile.close();
 }
