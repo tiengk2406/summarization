@@ -1,9 +1,11 @@
 #include "pageRank.hpp"
 #include "utils.hpp"
 
-const int NUM_OF_SENTENCES_OUT = 20;
-const float EPSILON = 0.0000000000056;
-const float THRESHOLD_PAGE_RANK = 0.1;
+const float EPSILON_PAGE_RANK = 0.0000000000056;
+const float THRESHOLD_PAGE_RANK = 0.5;
+const float DAMPING_FACTOR_PAGE_RANK = 0.85;
+const int PERSENT_OF_SENTENCES_OUT = 8; //8%
+const float ALPHA = 0.0; // value between pageRankScore and centralid
 
 int summurize(const std::filesystem::path& input, const std::filesystem::path& output,
               const std::filesystem::path& stopWordPath) {
@@ -25,6 +27,9 @@ int summurize(const std::filesystem::path& input, const std::filesystem::path& o
     }
     std::cout << "Path for training: " << entry.path().c_str() << std::endl;
     utils::parseOneFile(entry.path().c_str(), stopWordMap, &sentenceList);
+    if (sentenceList.size() == 0) {
+      continue;
+    }
     std::cout << "sentence vector size = " << sentenceList.size() << std::endl;
     PageRank pageRank(&sentenceList);
     //convert to tf-idf
@@ -47,16 +52,14 @@ int summurize(const std::filesystem::path& input, const std::filesystem::path& o
 
     utils::printMatrix(linkMatrix);
     std::vector<float> pageRankVal(cosineSize, 1.0 / cosineSize);
-    float dampingFactor = 0.85, epsilon = EPSILON;
     int iterations = 100;
-    pageRank.calculatePagerank(linkMatrix, pageRankVal, dampingFactor, iterations, epsilon);
+    pageRank.calculatePagerank(linkMatrix, pageRankVal, DAMPING_FACTOR_PAGE_RANK, iterations, EPSILON_PAGE_RANK);
 
     std::vector<float> pageRankAndRadVal;
-    float alpha = 0.2;
-    pageRank.calculateCompositeScore(centroid, tfidfMattrix, pageRankVal, alpha, pageRankAndRadVal);
+    pageRank.calculateCompositeScore(centroid, tfidfMattrix, pageRankVal, ALPHA, pageRankAndRadVal);
 
     //print output
-    int numOutputSentence = NUM_OF_SENTENCES_OUT;
+    int numOutputSentence = (PERSENT_OF_SENTENCES_OUT * sentenceList.size())/100;
     std::string fileOut = output.c_str() + (std::string)"/" + entry.path().stem().c_str();
     utils::writeToFile(sentenceList, pageRankAndRadVal, numOutputSentence, fileOut);
     // utils::writeToFile(sentenceList, pageRankVal, numOutputSentence, fileOut);
