@@ -110,7 +110,13 @@ void utils::writeToFile(const std::vector<std::unique_ptr<Sentence>>& sentenceLi
   int index = 0;
   std::ofstream summurizeOutputFile;
   std::cout << "\nOutput to file : " <<  path << std::endl;
+  std::cout << "page size " << pageRank.size() << std::endl;
   summurizeOutputFile.open(path.c_str());
+
+  // for (size_t ii = 0; ii < pageRank.size(); ++ii) {
+  //   std::cout << "[PageRanks Score=" << pageRank[ii] << "][DocID=" << sentenceList[ii].get()->docID << "]\n";
+  // }
+
   for(std::multimap<float, std::string>::const_reverse_iterator it = dst.rbegin(); it != dst.rend(); ++it) {
     if (index < numOutputSentence)
     {
