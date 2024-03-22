@@ -47,13 +47,13 @@ int summurize(const std::filesystem::path& input, const std::filesystem::path& o
     size_t cosineSize = consineMatrix.size();
     std::cout << "Consine matrix: [Row=" << cosineSize << "]\n\t\t[Col=" << consineMatrix[0].size() << "]\n";
 
-    //Convert to linkMatrix
-    std::vector<std::vector<int>> linkMatrix = pageRank.createLinkMatrix(consineMatrix, THRESHOLD_PAGE_RANK);
+    //Convert to adjacencyMatrix
+    std::vector<std::vector<int>> adjacencyMatrix = pageRank.createAdjacencyMatrix(consineMatrix, THRESHOLD_PAGE_RANK);
 
-    utils::printMatrix(linkMatrix);
+    utils::printMatrix(adjacencyMatrix);
     std::vector<float> pageRankVal(cosineSize, 1.0 / cosineSize);
     int iterations = 100;
-    pageRank.calculatePagerank(linkMatrix, pageRankVal, DAMPING_FACTOR_PAGE_RANK, iterations, EPSILON_PAGE_RANK);
+    pageRank.calculatePagerank(adjacencyMatrix, pageRankVal, DAMPING_FACTOR_PAGE_RANK, iterations, EPSILON_PAGE_RANK);
 
     std::vector<float> pageRankAndRadVal;
     pageRank.calculateCompositeScore(centroid, tfidfMattrix, pageRankVal, ALPHA, pageRankAndRadVal);
@@ -68,7 +68,7 @@ int summurize(const std::filesystem::path& input, const std::filesystem::path& o
     tfidfMattrix.clear();
     pageRankVal.clear();
     consineMatrix.clear();
-    linkMatrix.clear();
+    adjacencyMatrix.clear();
     centroid.clear();
     pageRankAndRadVal.clear();
   }
